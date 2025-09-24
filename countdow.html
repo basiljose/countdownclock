@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SIH 2025 - Internal Hackathon Countdown</title>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background-color: #000;
+        /* Center the banner container on the page */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .banner-container {
+        /* This is the main container for the image and the timer */
+        position: relative; 
+        width: 95vw;
+        height: 100vh;
+        
+        /* This now points directly to your image file */
+        background-image: url('slide1.gif'); 
+        background-position: center;
+        background-repeat: no-repeat;
+        /* 'contain' will ensure your entire poster is visible */
+        background-size: contain; 
+    }
+
+    .timer-overlay {
+        /* This positions the timer on top of the banner container */
+        position: absolute;
+        width: 100%;
+        bottom: 5%; /* Perfectly positioned in the lower blank area */
+        left: 0;
+        text-align: center;
+    }
+
+    #timer {
+        color: yellow;
+        /* Increased font size for better visibility */
+        font-size: 8em; 
+        margin: 0;
+        font-weight: bold;
+        /* A strong shadow helps readability on the white background */
+        text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
+    }
+</style>
+</head>
+<body>
+
+<div class="banner-container">
+    <div class="timer-overlay">
+        <h1 id="timer"></h1>
+    </div>
+</div>
+
+<script>
+// --- Countdown is set to the END of your event ---
+// Target: September 24, 2025 at 8:00 p.m. (20:00)
+const targetDate = new Date("Sep 24, 2025 20:00:00").getTime();
+
+const countdownFunction = setInterval(function() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance < 0) {
+        clearInterval(countdownFunction);
+        document.getElementById("timer").innerHTML = "HACKATHON OVER";
+        return;
+    }
+
+    const totalHours = Math.floor(distance / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+
+    document.getElementById("timer").innerHTML = totalHours + "h " + formattedMinutes + "m " + formattedSeconds + "s";
+
+}, 1000);
+</script>
+
+</body>
+</html>
