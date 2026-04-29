@@ -258,7 +258,7 @@
 
     <div class="neon-line"></div>
 
-    <div class="timer-label">Time &nbsp;Remaining</div>
+    <div class="timer-label" id="timer-label">Starts &nbsp;In</div>
 
     <div class="timer-grid" id="timer-grid">
         <div class="timer-block">
@@ -404,6 +404,7 @@ const elSeconds = document.getElementById('d-seconds');
 const elProgress = document.getElementById('progress-bar');
 const elEnded   = document.getElementById('ended-msg');
 const elGrid    = document.getElementById('timer-grid');
+const elLabel   = document.getElementById('timer-label');
 
 function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
@@ -424,6 +425,9 @@ let prevSec = -1;
         elProgress.style.width = '100%';
         return;
     }
+
+    /* Label switches once event begins */
+    elLabel.textContent = now < START ? 'Starts In' : 'Time Remaining';
 
     /* Before start: count down to start */
     const countTarget = now < START ? START - now : dist;
