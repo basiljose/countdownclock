@@ -1,87 +1,466 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>SIH 2025 - Internal Hackathon Countdown</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHYOTHON — AIEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body, html {
         height: 100%;
-        margin: 0;
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background-color: #000;
-        /* Center the banner container on the page */
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        overflow: hidden;
+        background: #030309;
+        font-family: 'Orbitron', sans-serif;
     }
 
-    .banner-container {
-        /* This is the main container for the image and the timer */
-        position: relative; 
-        width: 95vw;
+    /* ── Moving background canvas ── */
+    #bg-canvas {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0;
+    }
+
+    /* ── Scanline overlay ── */
+    .scanlines {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 1;
+        background: repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 3px,
+            rgba(0,0,0,0.12) 3px,
+            rgba(0,0,0,0.12) 4px
+        );
+        pointer-events: none;
+    }
+
+    /* ── Main layout ── */
+    .stage {
+        position: relative;
+        z-index: 2;
+        width: 100vw;
         height: 100vh;
-        
-        /* This now points directly to your image file */
-        background-image: url('slide1.gif'); 
-        background-position: center;
-        background-repeat: no-repeat;
-        /* 'contain' will ensure your entire poster is visible */
-        background-size: contain; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
     }
 
-    .timer-overlay {
-        /* This positions the timer on top of the banner container */
-        position: absolute;
+    /* ── Logo area ── */
+    .logo-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+
+    .institute-name {
+        margin-top: 10px;
+        font-size: 0.75rem;
+        letter-spacing: 0.35em;
+        color: #00ffe7;
+        text-shadow: 0 0 10px #00ffe7;
+        font-family: 'Share Tech Mono', monospace;
+        text-transform: uppercase;
+    }
+
+    /* ── Event title ── */
+    .event-title {
+        font-size: clamp(2.8rem, 8vw, 6.5rem);
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow:
+            0 0 8px #fff,
+            0 0 20px #ff00c8,
+            0 0 45px #ff00c8,
+            0 0 80px #ff00c8;
+        animation: glitch 4s infinite;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .event-subtitle {
+        font-size: clamp(0.65rem, 1.8vw, 1rem);
+        letter-spacing: 0.5em;
+        color: #ff00c8;
+        text-shadow: 0 0 12px #ff00c8;
+        font-family: 'Share Tech Mono', monospace;
+        text-transform: uppercase;
+        margin-bottom: 40px;
+    }
+
+    /* ── Divider line ── */
+    .neon-line {
+        width: min(700px, 85vw);
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #00ffe7, #ff00c8, #00ffe7, transparent);
+        box-shadow: 0 0 10px #00ffe7;
+        margin-bottom: 38px;
+    }
+
+    /* ── Timer ── */
+    .timer-label {
+        font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+        letter-spacing: 0.55em;
+        color: #00ffe7;
+        font-family: 'Share Tech Mono', monospace;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        opacity: 0.85;
+    }
+
+    .timer-grid {
+        display: flex;
+        align-items: flex-end;
+        gap: clamp(12px, 2.5vw, 28px);
+    }
+
+    .timer-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .timer-digit {
+        font-size: clamp(3.5rem, 10vw, 8rem);
+        font-weight: 900;
+        line-height: 1;
+        color: #00ffe7;
+        text-shadow:
+            0 0 6px #00ffe7,
+            0 0 20px #00ffe7,
+            0 0 45px #00ffe7;
+        font-variant-numeric: tabular-nums;
+        min-width: 2ch;
+        text-align: center;
+        transition: text-shadow 0.15s;
+    }
+
+    .timer-digit.tick {
+        text-shadow:
+            0 0 10px #fff,
+            0 0 30px #00ffe7,
+            0 0 60px #00ffe7,
+            0 0 100px #00ffe7;
+    }
+
+    .timer-unit {
+        font-size: clamp(0.5rem, 1.1vw, 0.7rem);
+        letter-spacing: 0.4em;
+        color: #ff00c8;
+        text-shadow: 0 0 8px #ff00c8;
+        font-family: 'Share Tech Mono', monospace;
+        text-transform: uppercase;
+    }
+
+    .timer-sep {
+        font-size: clamp(3rem, 8vw, 6.5rem);
+        font-weight: 900;
+        color: #ff00c8;
+        line-height: 1;
+        margin-bottom: 20px;
+        text-shadow: 0 0 14px #ff00c8;
+        animation: blink-sep 1s step-end infinite;
+    }
+
+    @keyframes blink-sep {
+        50% { opacity: 0.15; }
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+        margin-top: 38px;
+        width: min(700px, 82vw);
+    }
+
+    .progress-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.6rem;
+        letter-spacing: 0.25em;
+        color: rgba(0,255,231,0.5);
+        font-family: 'Share Tech Mono', monospace;
+        margin-bottom: 7px;
+    }
+
+    .progress-bar-outer {
         width: 100%;
-        bottom: 5%; /* Perfectly positioned in the lower blank area */
-        left: 0;
+        height: 6px;
+        background: rgba(0,255,231,0.1);
+        border: 1px solid rgba(0,255,231,0.25);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-bar-inner {
+        height: 100%;
+        background: linear-gradient(90deg, #00ffe7, #ff00c8);
+        box-shadow: 0 0 10px #00ffe7;
+        border-radius: 3px;
+        transition: width 1s linear;
+        width: 0%;
+    }
+
+    /* ── End message ── */
+    .ended-msg {
+        display: none;
+        font-size: clamp(2rem, 6vw, 4rem);
+        font-weight: 900;
+        color: #ff00c8;
+        text-shadow: 0 0 20px #ff00c8, 0 0 60px #ff00c8;
+        letter-spacing: 0.18em;
+        animation: glitch 2s infinite;
         text-align: center;
     }
 
-    #timer {
-        color: yellow;
-        /* Increased font size for better visibility */
-        font-size: 8em; 
-        margin: 0;
-        font-weight: bold;
-        /* A strong shadow helps readability on the white background */
-        text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
+    /* ── Glitch keyframes ── */
+    @keyframes glitch {
+        0%, 90%, 100% { transform: translate(0); clip-path: none; }
+        91% { transform: translate(-3px, 1px); clip-path: inset(20% 0 50% 0); }
+        93% { transform: translate(3px, -1px); clip-path: inset(60% 0 10% 0); }
+        95% { transform: translate(-2px, 2px); clip-path: inset(40% 0 30% 0); }
+        97% { transform: translate(0); clip-path: none; }
     }
+
+    /* ── Corner decoration ── */
+    .corner {
+        position: fixed;
+        width: 40px; height: 40px;
+        border-color: rgba(0,255,231,0.4);
+        border-style: solid;
+        z-index: 3;
+    }
+    .corner-tl { top: 18px; left: 18px; border-width: 2px 0 0 2px; }
+    .corner-tr { top: 18px; right: 18px; border-width: 2px 2px 0 0; }
+    .corner-bl { bottom: 18px; left: 18px; border-width: 0 0 2px 2px; }
+    .corner-br { bottom: 18px; right: 18px; border-width: 0 2px 2px 0; }
 </style>
 </head>
 <body>
 
-<div class="banner-container">
-    <div class="timer-overlay">
-        <h1 id="timer"></h1>
+<canvas id="bg-canvas"></canvas>
+<div class="scanlines"></div>
+
+<!-- Corner decorations -->
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<div class="stage">
+
+    <div class="logo-wrap">
+        <img src="logo_full.png" alt="AIEM Logo" style="height:90px;width:auto;object-fit:contain;filter:drop-shadow(0 0 10px #00ffe7);">
+        <div class="institute-name">Agnel Institute of Engineering &amp; Management</div>
     </div>
+
+    <div class="event-title">TECHYOTHON</div>
+    <div class="event-subtitle">24 &nbsp;Hour &nbsp;Hackathon &nbsp;&bull;&nbsp; AIEM</div>
+
+    <div class="neon-line"></div>
+
+    <div class="timer-label">Time &nbsp;Remaining</div>
+
+    <div class="timer-grid" id="timer-grid">
+        <div class="timer-block">
+            <div class="timer-digit" id="d-hours">00</div>
+            <div class="timer-unit">Hours</div>
+        </div>
+        <div class="timer-sep">:</div>
+        <div class="timer-block">
+            <div class="timer-digit" id="d-minutes">00</div>
+            <div class="timer-unit">Minutes</div>
+        </div>
+        <div class="timer-sep">:</div>
+        <div class="timer-block">
+            <div class="timer-digit" id="d-seconds">00</div>
+            <div class="timer-unit">Seconds</div>
+        </div>
+    </div>
+
+    <div class="ended-msg" id="ended-msg">// TECHYOTHON COMPLETE //</div>
+
+    <div class="progress-wrap">
+        <div class="progress-labels">
+            <span>START &nbsp;29 APR &nbsp;14:00</span>
+            <span>END &nbsp;30 APR &nbsp;14:00</span>
+        </div>
+        <div class="progress-bar-outer">
+            <div class="progress-bar-inner" id="progress-bar"></div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-// --- Countdown is set to the END of your event ---
-// Target: September 24, 2025 at 8:00 p.m. (20:00)
-const targetDate = new Date("Sep 24, 2025 20:00:00").getTime();
+/* ── Animated canvas background: grid + particle rain ── */
+(function () {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
 
-const countdownFunction = setInterval(function() {
-    const now = new Date().getTime();
-    const distance = targetDate - now;
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    if (distance < 0) {
-        clearInterval(countdownFunction);
-        document.getElementById("timer").innerHTML = "HACKATHON OVER";
+    /* Grid */
+    const GRID = 60;
+    let gridOffset = 0;
+
+    /* Particles — cyan digital rain style */
+    const CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ';
+    const COLS = Math.ceil(window.innerWidth / 20) + 2;
+    const drops = Array.from({ length: COLS }, () => ({
+        y: Math.random() * -100,
+        speed: 0.4 + Math.random() * 0.9,
+        char: '',
+        opacity: 0.05 + Math.random() * 0.3,
+        bright: Math.random() < 0.08
+    }));
+
+    function randomChar() {
+        return CHARS[Math.floor(Math.random() * CHARS.length)];
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        /* Dark base */
+        ctx.fillStyle = '#030309';
+        ctx.fillRect(0, 0, W, H);
+
+        /* Moving perspective grid */
+        gridOffset = (gridOffset + 0.4) % GRID;
+        ctx.strokeStyle = 'rgba(0,255,231,0.07)';
+        ctx.lineWidth = 1;
+
+        /* Horizontal lines scrolling down */
+        for (let y = -GRID + gridOffset; y < H; y += GRID) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
+            ctx.stroke();
+        }
+        /* Vertical lines */
+        for (let x = 0; x < W; x += GRID) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, H);
+            ctx.stroke();
+        }
+
+        /* Digital rain columns */
+        const COL_W = 20;
+        drops.forEach((drop, i) => {
+            drop.char = randomChar();
+            drop.y += drop.speed;
+
+            const x = i * COL_W;
+            const alpha = drop.bright ? drop.opacity * 3.5 : drop.opacity;
+
+            ctx.font = `${drop.bright ? 'bold ' : ''}13px "Share Tech Mono", monospace`;
+
+            if (drop.bright) {
+                ctx.fillStyle = `rgba(255,255,255,${Math.min(alpha, 1)})`;
+            } else {
+                ctx.fillStyle = `rgba(0,255,231,${Math.min(alpha, 1)})`;
+            }
+            ctx.fillText(drop.char, x, drop.y);
+
+            /* Trail */
+            ctx.fillStyle = `rgba(0,255,231,${Math.min(alpha * 0.3, 0.12)})`;
+            ctx.fillText(randomChar(), x, drop.y - COL_W);
+
+            if (drop.y > H + 20) {
+                drop.y = Math.random() * -60;
+                drop.speed = 0.4 + Math.random() * 0.9;
+                drop.opacity = 0.05 + Math.random() * 0.3;
+                drop.bright = Math.random() < 0.08;
+            }
+        });
+
+        /* Vignette */
+        const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.9);
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.6)');
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, W, H);
+
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+/* ── Countdown timer ── */
+const START = new Date("Apr 29, 2026 14:00:00").getTime();
+const END   = new Date("Apr 30, 2026 14:00:00").getTime();
+const TOTAL = END - START;
+
+const elHours   = document.getElementById('d-hours');
+const elMinutes = document.getElementById('d-minutes');
+const elSeconds = document.getElementById('d-seconds');
+const elProgress = document.getElementById('progress-bar');
+const elEnded   = document.getElementById('ended-msg');
+const elGrid    = document.getElementById('timer-grid');
+
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+function flashTick(el) {
+    el.classList.add('tick');
+    setTimeout(() => el.classList.remove('tick'), 120);
+}
+
+let prevSec = -1;
+
+(function tick() {
+    const now  = Date.now();
+    const dist = END - now;
+
+    if (dist <= 0) {
+        elGrid.style.display = 'none';
+        elEnded.style.display = 'block';
+        elProgress.style.width = '100%';
         return;
     }
 
-    const totalHours = Math.floor(distance / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    
-    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-    const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+    /* Before start: count down to start */
+    const countTarget = now < START ? START - now : dist;
 
-    document.getElementById("timer").innerHTML = totalHours + "h " + formattedMinutes + "m " + formattedSeconds + "s";
+    const h = Math.floor(countTarget / 3_600_000);
+    const m = Math.floor((countTarget % 3_600_000) / 60_000);
+    const s = Math.floor((countTarget % 60_000) / 1_000);
 
-}, 1000);
+    elHours.textContent   = pad(h);
+    elMinutes.textContent = pad(m);
+
+    if (s !== prevSec) {
+        elSeconds.textContent = pad(s);
+        flashTick(elSeconds);
+        if (s === 59) flashTick(elMinutes);
+        prevSec = s;
+    }
+
+    /* Progress bar (only active during event) */
+    if (now >= START) {
+        const elapsed = now - START;
+        elProgress.style.width = Math.min((elapsed / TOTAL) * 100, 100) + '%';
+    }
+
+    setTimeout(tick, 250);
+})();
 </script>
-
 </body>
 </html>
