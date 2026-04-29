@@ -109,13 +109,13 @@
 
     /* ── Timer ── */
     .timer-label {
-        font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+        font-size: clamp(0.85rem, 2vw, 1.3rem);
         letter-spacing: 0.55em;
         color: #00ffe7;
         font-family: 'Share Tech Mono', monospace;
         text-transform: uppercase;
-        margin-bottom: 12px;
-        opacity: 0.85;
+        margin-bottom: 14px;
+        text-shadow: 0 0 12px #00ffe7;
     }
 
     .timer-grid {
@@ -132,14 +132,17 @@
     }
 
     .timer-digit {
-        font-size: clamp(3.5rem, 10vw, 8rem);
+        font-size: clamp(5rem, 16vw, 13rem);
         font-weight: 900;
         line-height: 1;
-        color: #00ffe7;
+        color: #fff;
         text-shadow:
-            0 0 6px #00ffe7,
-            0 0 20px #00ffe7,
-            0 0 45px #00ffe7;
+            0 0 4px #fff,
+            0 0 14px #fff,
+            0 0 30px #00ffe7,
+            0 0 60px #00ffe7,
+            0 0 110px #00ffe7,
+            0 0 180px #00ffe7;
         font-variant-numeric: tabular-nums;
         min-width: 2ch;
         text-align: center;
@@ -148,28 +151,30 @@
 
     .timer-digit.tick {
         text-shadow:
-            0 0 10px #fff,
-            0 0 30px #00ffe7,
-            0 0 60px #00ffe7,
-            0 0 100px #00ffe7;
+            0 0 6px #fff,
+            0 0 20px #fff,
+            0 0 50px #00ffe7,
+            0 0 100px #00ffe7,
+            0 0 160px #00ffe7,
+            0 0 240px #00ffe7;
     }
 
     .timer-unit {
-        font-size: clamp(0.5rem, 1.1vw, 0.7rem);
-        letter-spacing: 0.4em;
+        font-size: clamp(0.8rem, 1.8vw, 1.2rem);
+        letter-spacing: 0.45em;
         color: #ff00c8;
-        text-shadow: 0 0 8px #ff00c8;
+        text-shadow: 0 0 10px #ff00c8, 0 0 25px #ff00c8;
         font-family: 'Share Tech Mono', monospace;
         text-transform: uppercase;
     }
 
     .timer-sep {
-        font-size: clamp(3rem, 8vw, 6.5rem);
+        font-size: clamp(4rem, 13vw, 11rem);
         font-weight: 900;
         color: #ff00c8;
         line-height: 1;
-        margin-bottom: 20px;
-        text-shadow: 0 0 14px #ff00c8;
+        margin-bottom: 22px;
+        text-shadow: 0 0 14px #ff00c8, 0 0 40px #ff00c8;
         animation: blink-sep 1s step-end infinite;
     }
 
@@ -265,7 +270,7 @@
     </div>
 
     <div class="event-title">TECHYOTHON</div>
-    <div class="event-subtitle">24 &nbsp;Hour &nbsp;Hackathon &nbsp;&bull;&nbsp; AIEM</div>
+    <div class="event-subtitle">24 &nbsp;Hour &nbsp;Hackathon &nbsp;&bull;&nbsp; AIEM &nbsp;&bull;&nbsp; 2026</div>
 
     <div class="neon-line"></div>
 
